@@ -1,12 +1,23 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_joystick/flutter_joystick.dart';
 import 'package:web_socket_channel/io.dart';
-import 'package:web_socket_channel/status.dart' as status;
+// import 'package:web_socket_channel/status.dart' as status;
 
 void main() {
-  runApp(const MyApp());
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+  WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isIOS || Platform.isAndroid) {
+    SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft])
+        .then((_) {
+      runApp(const MyApp());
+    });
+  } else {
+    runApp(const MyApp());
+  }
+
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.red,
     //statusBarIconBrightness: Brightness.dark
   ));
@@ -69,19 +80,19 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
-          title: Text("Joystick Controls"),
+          title: const Text("Joystick Controls"),
 
           leading: GestureDetector(
             onTap: () {
               _showMyDialog();
             },
-            child: Icon(
+            child: const Icon(
               Icons.settings, // add custom icons also
             ),
           ),
         ),
         bottomSheet: Container(
-            padding: EdgeInsets.only(left: 50, right: 50, bottom: 50),
+            padding: const EdgeInsets.only(left: 50, right: 50, bottom: 50),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
