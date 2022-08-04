@@ -30,7 +30,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -43,31 +42,19 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.red,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
   double _value = 1;
+  String rpi = "ws://192.168.2.128:1234";
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -97,23 +84,15 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Joystick(
-                    stick: Container(
-                      width: MediaQuery.of(context).size.width / 12,
-                      height: MediaQuery.of(context).size.width / 12,
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.red[900],
-                          border:
-                              Border.all(width: 1, color: Colors.transparent)),
+                    stick: CustomPaint(
+                      size: Size(MediaQuery.of(context).size.width / 12,
+                          MediaQuery.of(context).size.width / 12),
+                      painter: CirclePainter(),
                     ),
-                    base: Container(
-                      width: MediaQuery.of(context).size.width / 4.5,
-                      height: MediaQuery.of(context).size.width / 4.5,
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.red[400],
-                          border:
-                              Border.all(width: 1, color: Colors.transparent)),
+                    base: CustomPaint(
+                      size: Size(MediaQuery.of(context).size.width / 4.5,
+                          MediaQuery.of(context).size.width / 4.5),
+                      painter: CirclePainter2(),
                     ),
                     // onStickDragEnd: () {
                     //   var channel =
@@ -121,8 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     //   channel.sink.add("end");
                     // },
                     listener: (details) {
-                      var channel = IOWebSocketChannel.connect(
-                          Uri.parse('ws://localhost:1234'));
+                      var channel = IOWebSocketChannel.connect(Uri.parse(rpi));
                       if (details.x > details.y) {
                         if (details.x > 0.2) {
                           channel.sink.add("right");
@@ -138,23 +116,15 @@ class _MyHomePageState extends State<MyHomePage> {
                       }
                     }),
                 Joystick(
-                    stick: Container(
-                      width: MediaQuery.of(context).size.width / 12,
-                      height: MediaQuery.of(context).size.width / 12,
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.red[900],
-                          border:
-                              Border.all(width: 1, color: Colors.transparent)),
+                    stick: CustomPaint(
+                      size: Size(MediaQuery.of(context).size.width / 12,
+                          MediaQuery.of(context).size.width / 12),
+                      painter: CirclePainter(),
                     ),
-                    base: Container(
-                      width: MediaQuery.of(context).size.width / 4.5,
-                      height: MediaQuery.of(context).size.width / 4.5,
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.red[400],
-                          border:
-                              Border.all(width: 1, color: Colors.transparent)),
+                    base: CustomPaint(
+                      size: Size(MediaQuery.of(context).size.width / 4.5,
+                          MediaQuery.of(context).size.width / 4.5),
+                      painter: CirclePainter2(),
                     ),
                     // onStickDragEnd: () {
                     //   var channel =
@@ -162,8 +132,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     //   channel.sink.add("end");
                     // },
                     listener: (details) {
-                      var channel = IOWebSocketChannel.connect(
-                          Uri.parse('ws://localhost:1234'));
+                      var channel = IOWebSocketChannel.connect(Uri.parse(rpi));
                       if (details.x > details.y) {
                         if (details.x > 0.2) {
                           channel.sink.add("right");
@@ -196,23 +165,21 @@ class _MyHomePageState extends State<MyHomePage> {
               return SizedBox(
                 width: 250,
                 height: 75,
-                child: SingleChildScrollView(
-                  child: ListBody(
-                    children: <Widget>[
-                      Text("${_value.toInt()}%"),
-                      Slider(
-                        min: 1,
-                        max: 100,
-                        divisions: 10,
-                        value: _value,
-                        onChanged: (value) {
-                          setState2(() {
-                            _value = value;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
+                child: Column(
+                  children: <Widget>[
+                    Text("${_value.toInt()}"),
+                    Slider(
+                      min: 1,
+                      max: 9,
+                      divisions: 8,
+                      value: _value,
+                      onChanged: (value) {
+                        setState2(() {
+                          _value = value;
+                        });
+                      },
+                    ),
+                  ],
                 ),
               );
             },
@@ -221,9 +188,8 @@ class _MyHomePageState extends State<MyHomePage> {
             TextButton(
               child: const Text('Set'),
               onPressed: () {
-                var channel = IOWebSocketChannel.connect(
-                    Uri.parse('ws://localhost:1234'));
-                channel.sink.add("${(_value / 10).toInt()}");
+                var channel = IOWebSocketChannel.connect(Uri.parse(rpi));
+                channel.sink.add("${_value.toInt()}");
                 Navigator.of(context).pop();
               },
             ),
@@ -232,4 +198,42 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     );
   }
+}
+
+class CirclePainter extends CustomPainter {
+  final _paint = Paint()
+    ..color = Colors.red[900]!
+    ..strokeWidth = 2
+    // Use [PaintingStyle.fill] if you want the circle to be filled.
+    ..style = PaintingStyle.fill;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.drawOval(
+      Rect.fromLTWH(0, 0, size.width, size.height),
+      _paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
+}
+
+class CirclePainter2 extends CustomPainter {
+  final _paint = Paint()
+    ..color = Colors.red[400]!
+    ..strokeWidth = 2
+    // Use [PaintingStyle.fill] if you want the circle to be filled.
+    ..style = PaintingStyle.fill;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.drawOval(
+      Rect.fromLTWH(0, 0, size.width, size.height),
+      _paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
