@@ -14,22 +14,55 @@ async def hello(websocket, path):
     data = await websocket.recv()
 
 
-    if data == "up":
+    if data == "rf": #reach forward
         print(data)
         toWrite = intensity + 'u\n'
         ser.write(toWrite.encode(encoding = 'UTF-8'))
-    elif data == "down":
+    elif data == "rb": #reach back
         print(data)
         toWrite = intensity + 'd\n'
         ser.write(toWrite.encode(encoding = 'UTF-8'))
-    elif data == "left":
+    elif data == "bl": #base left
         print(data)
         toWrite = intensity + 'l\n'
         ser.write(toWrite.encode(encoding = 'UTF-8'))
-    elif data == "right":
+    elif data == "br": #base right
         print(data)
         toWrite = intensity + 'r\n'
         ser.write(toWrite.encode(encoding = 'UTF-8'))
+    elif data == "ef":  # shoulder forwards
+        print(data)
+        toWrite = intensity + 'f\n'
+        ser.write(toWrite.encode(encoding='UTF-8'))
+    elif data == "eb":  # shoulder back
+        print(data)
+        toWrite = intensity + 'b\n'
+        ser.write(toWrite.encode(encoding='UTF-8'))
+    elif data == "rl":  # rotate wrist left
+        print(data)
+        toWrite = intensity + 'i\n'
+        ser.write(toWrite.encode(encoding='UTF-8'))
+    elif data == "rr":  # rotate wrist right
+        print(data)
+        toWrite = intensity + 'j\n'
+        ser.write(toWrite.encode(encoding='UTF-8'))
+
+    elif data == "wf":  # wrist forward
+        print(data)
+        toWrite = intensity + 'q\n'
+        ser.write(toWrite.encode(encoding='UTF-8'))
+    elif data == "wb":  # wrist back
+        print(data)
+        toWrite = intensity + 'w\n'
+        ser.write(toWrite.encode(encoding='UTF-8'))
+    elif data == "co":  # claw open
+        print(data)
+        toWrite = intensity + 'y\n'
+        ser.write(toWrite.encode(encoding='UTF-8'))
+    elif data == "cc":  # claw closed
+        print(data)
+        toWrite = intensity + 'z\n'
+        ser.write(toWrite.encode(encoding='UTF-8'))
     else:
         intensity = data
         print(intensity)

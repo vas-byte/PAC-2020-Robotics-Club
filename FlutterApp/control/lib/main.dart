@@ -1,80 +1,63 @@
 import 'dart:io';
-
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_joystick/flutter_joystick.dart';
-import 'package:web_socket_channel/io.dart';
-// import 'package:web_socket_channel/status.dart' as status;
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (Platform.isIOS || Platform.isAndroid) {
-    SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft])
-        .then((_) {
-      runApp(const MyApp());
-    });
-  } else {
-    runApp(const MyApp());
-  }
+
+  var socket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, 1234);
+  runApp(MyApp(socket: socket));
 
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.red,
-    //statusBarIconBrightness: Brightness.dark
   ));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
+  final RawDatagramSocket socket;
+  const MyApp({Key? key, required this.socket}) : super(key: key);
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.red,
       ),
-      home: MyHomePage(),
+      home: MyHomePage(socket: socket),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
+  final RawDatagramSocket socket;
+
+  const MyHomePage({super.key, required this.socket});
+
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
   double _value = 1;
-  String rpi = "ws://192.168.2.128:1234";
+
+  void sendData(String data) {
+    widget.socket
+        .send(Utf8Codec().encode(data), InternetAddress("172.20.10.4"), 1234);
+  }
+
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
         appBar: AppBar(
-          // Here we take the value from the MyHomePage object that was created by
-          // the App.build method, and use it to set our appbar title.
           title: const Text("Joystick Controls"),
-
           leading: GestureDetector(
             onTap: () {
               _showMyDialog();
             },
             child: const Icon(
-              Icons.settings, // add custom icons also
+              Icons.settings,
             ),
           ),
         ),
@@ -94,24 +77,18 @@ class _MyHomePageState extends State<MyHomePage> {
                           MediaQuery.of(context).size.width / 4.5),
                       painter: CirclePainter2(),
                     ),
-                    // onStickDragEnd: () {
-                    //   var channel =
-                    //       IOWebSocketChannel.connect(Uri.parse('ws://localhost:1234'));
-                    //   channel.sink.add("end");
-                    // },
                     listener: (details) {
-                      var channel = IOWebSocketChannel.connect(Uri.parse(rpi));
                       if (details.x > details.y) {
                         if (details.x > 0.2) {
-                          channel.sink.add("right");
+                          sendData("br");
                         } else if (details.x < 0.2) {
-                          channel.sink.add("up");
+                          sendData("rf");
                         }
                       } else {
                         if (details.y > 0.2) {
-                          channel.sink.add("down");
+                          sendData("rb");
                         } else if (details.y < 0.2) {
-                          channel.sink.add("left");
+                          sendData("bl");
                         }
                       }
                     }),
@@ -126,24 +103,44 @@ class _MyHomePageState extends State<MyHomePage> {
                           MediaQuery.of(context).size.width / 4.5),
                       painter: CirclePainter2(),
                     ),
-                    // onStickDragEnd: () {
-                    //   var channel =
-                    //       IOWebSocketChannel.connect(Uri.parse('ws://localhost:1234'));
-                    //   channel.sink.add("end");
-                    // },
                     listener: (details) {
-                      var channel = IOWebSocketChannel.connect(Uri.parse(rpi));
                       if (details.x > details.y) {
                         if (details.x > 0.2) {
-                          channel.sink.add("right");
+                          sendData("co");
                         } else if (details.x < 0.2) {
-                          channel.sink.add("up");
+                          sendData("wf");
                         }
                       } else {
                         if (details.y > 0.2) {
-                          channel.sink.add("down");
+                          sendData("wb");
                         } else if (details.y < 0.2) {
-                          channel.sink.add("left");
+                          sendData("cc");
+                        }
+                      }
+                    }),
+                Joystick(
+                    stick: CustomPaint(
+                      size: Size(MediaQuery.of(context).size.width / 12,
+                          MediaQuery.of(context).size.width / 12),
+                      painter: CirclePainter(),
+                    ),
+                    base: CustomPaint(
+                      size: Size(MediaQuery.of(context).size.width / 4.5,
+                          MediaQuery.of(context).size.width / 4.5),
+                      painter: CirclePainter2(),
+                    ),
+                    listener: (details) {
+                      if (details.x > details.y) {
+                        if (details.x > 0.2) {
+                          sendData("rr");
+                        } else if (details.x < 0.2) {
+                          sendData("ef");
+                        }
+                      } else {
+                        if (details.y > 0.2) {
+                          sendData("eb");
+                        } else if (details.y < 0.2) {
+                          sendData("rl");
                         }
                       }
                     }),
@@ -188,8 +185,7 @@ class _MyHomePageState extends State<MyHomePage> {
             TextButton(
               child: const Text('Set'),
               onPressed: () {
-                var channel = IOWebSocketChannel.connect(Uri.parse(rpi));
-                channel.sink.add("${_value.toInt()}");
+                sendData("${_value.toInt()}");
                 Navigator.of(context).pop();
               },
             ),
