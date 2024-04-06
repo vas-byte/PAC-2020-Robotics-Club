@@ -1,7 +1,7 @@
 # Remote Control Application for Braccio Robotic Arm
 
  - **Flutter** used to create frontend application
- - **NodeJS** hosts webserver that recieves incoming socket connection (UDP)
+ - **NodeJS** hosts webserver that uses sockets to recieve incomming packets (UDP)
  - **Arduino** used to control robotic arm, connection established via USB Serial from Node webserver
  
 ## To Get Started
