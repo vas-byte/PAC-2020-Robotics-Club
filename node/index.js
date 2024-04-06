@@ -3,7 +3,7 @@ const socket = dgram.createSocket({type: 'udp4', reuseAddr: true}); // Create a 
 const port = 1234 // The port Flutter sends data to
 const { SerialPort } = require('serialport')
 
-const serialport = new SerialPort({ path: '/dev/ttyACM0', baudRate: 9600 })
+const serialport = new SerialPort({ path: 'USB SERIAL PORT E.G. /dev/ttyACM0', baudRate: 9600 })
 
 var intensity = "1";
 
