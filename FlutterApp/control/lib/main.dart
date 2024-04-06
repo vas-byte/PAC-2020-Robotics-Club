@@ -44,7 +44,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void sendData(String data) {
     widget.socket
-        .send(Utf8Codec().encode(data), InternetAddress("172.20.10.4"), 1234);
+        .send(Utf8Codec().encode(data), InternetAddress("IP ADDRESS GOES HERE"), 1234);
   }
 
   @override
